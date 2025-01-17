@@ -108,6 +108,18 @@
         // Array to hold tasks
         const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
+        // Function to update the time remaining for all tasks
+        function updateTimeRemaining() {
+            tasks.forEach(task => {
+                const targetDateTime = new Date(`${task.targetDate}T${task.targetTime}`);
+                const now = new Date();
+                const diff = targetDateTime - now;
+                task.timeRemaining = calculateTimeRemaining(diff);
+            });
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            displayTasks();
+        }
+
         // Display all tasks
         function displayTasks() {
             taskListContainer.innerHTML = '';
@@ -189,6 +201,9 @@
 
         // Initialize task list
         displayTasks();
+
+        // Update time remaining every second
+        setInterval(updateTimeRemaining, 1000);
     </script>
 </body>
 </html>

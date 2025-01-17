@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Remaining Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #f4f4f9;
+            color: #333;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        label, input, .output {
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .output {
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Time Remaining Calculator</h1>
+        <label for="target-date">Select Target Date:</label>
+        <input type="date" id="target-date">
+
+        <label for="target-time">Select Target Time:</label>
+        <input type="time" id="target-time">
+
+        <div class="output" id="time-remaining"></div>
+        <div class="error" id="error-message"></div>
+    </div>
+
+    <script>
+        const dateInput = document.getElementById('target-date');
+        const timeInput = document.getElementById('target-time');
+        const output = document.getElementById('time-remaining');
+        const errorMessage = document.getElementById('error-message');
+
+        // Load the saved target date and time from localStorage
+        const savedDate = localStorage.getItem('targetDate');
+        const savedTime = localStorage.getItem('targetTime');
+
+        if (savedDate) dateInput.value = savedDate;
+        if (savedTime) timeInput.value = savedTime;
+
+        if (savedDate && savedTime) {
+            calculateTimeRemaining();
+        }
+
+        dateInput.addEventListener('input', saveInputsAndCalculate);
+        timeInput.addEventListener('input', saveInputsAndCalculate);
+
+        function saveInputsAndCalculate() {
+            const dateValue = dateInput.value;
+            const timeValue = timeInput.value;
+
+            localStorage.setItem('targetDate', dateValue);
+            localStorage.setItem('targetTime', timeValue);
+
+            calculateTimeRemaining();
+        }
+
+        function calculateTimeRemaining() {
+            const targetDate = dateInput.value;
+            const targetTime = timeInput.value;
+
+            if (!targetDate || !targetTime) {
+                output.textContent = '';
+                errorMessage.textContent = 'Please select both date and time.';
+                return;
+            }
+
+            errorMessage.textContent = '';
+
+            const targetDateTime = new Date(`${targetDate}T${targetTime}`);
+            const now = new Date();
+
+            if (isNaN(targetDateTime.getTime())) {
+                output.textContent = '';
+                errorMessage.textContent = 'Please enter a valid date and time.';
+                return;
+            }
+
+            const diff = targetDateTime - now;
+
+            if (diff <= 0) {
+                output.textContent = 'The specified time has already passed!';
+                return;
+            }
+
+            const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+            const months = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30));
+            const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            output.textContent = `
+                ${years} years, 
+                ${months} months, 
+                ${days} days, 
+                ${hours} hours, 
+                ${minutes} minutes, 
+                ${seconds} seconds remaining.`;
+        }
+    </script>
+</body>
+</html>

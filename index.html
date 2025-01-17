@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do List with Time Remaining</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><text y='14' font-size='14' fill='black'>🎓</text></svg>">
-
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -49,6 +48,22 @@
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .task button:hover {
+            background-color: darkred;
         }
 
         .error {
@@ -96,13 +111,16 @@
         // Display all tasks
         function displayTasks() {
             taskListContainer.innerHTML = '';
-            tasks.forEach(task => {
+            tasks.forEach((task, index) => {
                 const taskElement = document.createElement('div');
                 taskElement.classList.add('task');
                 taskElement.innerHTML = `
-                    <strong>${task.name}</strong><br>
-                    Target: ${task.targetDate} ${task.targetTime}<br>
-                    Time Remaining: ${task.timeRemaining}
+                    <div>
+                        <strong>${task.name}</strong><br>
+                        Target: ${task.targetDate} ${task.targetTime}<br>
+                        Time Remaining: ${task.timeRemaining}
+                    </div>
+                    <button onclick="deleteTask(${index})">Delete</button>
                 `;
                 taskListContainer.appendChild(taskElement);
             });
@@ -149,6 +167,13 @@
             dateInput.value = '';
             timeInput.value = '';
         });
+
+        // Delete a task
+        function deleteTask(index) {
+            tasks.splice(index, 1);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            displayTasks();
+        }
 
         // Calculate time remaining
         function calculateTimeRemaining(diff) {
